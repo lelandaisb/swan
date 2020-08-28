@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<viewpoint:DAnalysis xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:description="http://www.eclipse.org/sirius/description/1.1.0" xmlns:viewpoint="http://www.eclipse.org/sirius/1.1.0" xsi:schemaLocation="http://www.eclipse.org/sirius/description/1.1.0 http://www.eclipse.org/sirius/1.1.0#//description" uid="_6s96UMzuEeqw3rDyt3FGwQ" selectedViews="_6vLg0MzuEeqw3rDyt3FGwQ" version="14.3.0.201909031200">
+  <semanticResources>src/swan/Swan.nabla</semanticResources>
+  <semanticResources>src/swan/Swan.nablagen</semanticResources>
+  <semanticResources>platform:/resource/fr.cea.nabla/mathfunctions.nabla</semanticResources>
+  <semanticResources>src-gen-cpp/stl-thread/swan/swan.nabla</semanticResources>
+  <semanticResources>src-gen-cpp/kokkos/swan/swan.nabla</semanticResources>
+  <ownedViews xmi:type="viewpoint:DView" uid="_6vLg0MzuEeqw3rDyt3FGwQ">
+    <viewpoint xmi:type="description:Viewpoint" href="platform:/plugin/fr.cea.nabla.sirius/description/i1.odesign#//@ownedViewpoints[name='InstructionViewpoint']"/>
+  </ownedViews>
+</viewpoint:DAnalysis>

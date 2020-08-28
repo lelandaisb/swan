@@ -1,0 +1,46 @@
+with SwanGEO.*;
+
+nablagen for SwanGEO;
+
+SimulationVariables
+{
+	nodeCoord = X;
+	time = t;
+	timeStep = δt;
+	iterationMax = maxIter;
+	timeMax = stopTime;
+}
+
+VtkOutput
+{
+	periodReferenceVariable = n;
+	outputVariables = H as "hauteur", Dij as "profondeur", Rij as "bottommotion", Bool as "bool";
+}
+
+StlThread
+{
+	outputPath = "/swan/src-gen-cpp/stl-thread";
+	compiler = GNU;
+	//compilerPath = "/ccc/products/gcc-9.3.0/system/default/bin/g++";
+//		compiler = LLVM;
+     //compilerPath = "/ccc/products/gcc-9.3.0/system/default/bin/gcc";
+}
+
+ /*
+Kokkos
+{
+	outputPath = "/swan/src-gen-cpp/kokkos";
+	kokkosPath = "$ENV{HOME}/kokkos/kokkos-install";
+	compiler = GNU;
+	compilerPath = "/ccc/products/gcc-9.3.0/system/default/bin/g++";
+}
+*/
+
+/* 
+KokkosTeamThread
+{
+	outputPath = "/swan/src-gen-cpp/kokkos-team";
+	kokkosPath = "$ENV{HOME}/kokkos/kokkos-install";
+	compiler = GNU;
+}
+*/
