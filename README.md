@@ -71,17 +71,6 @@ div { text-align: justify; text-justify: inter-word; }
 <p>
 
 <center><h1>The SWAN Code</h1></center>  <!-- document title -->
-<p>
-<!-- author: Guillaume LESCROART -->
-<center>
-<b>Guillaume LESCROART { guillaume.lescroart.ocre@cea.fr }</b>
-</center>
-
-<p>
-<!-- institution -->
-<center><b>CEA</b></center>
-<br>
-<p>
 
 <b>Ce document a été écrit pour permettre une bonne compréhension du code SWAN développé en langage Nabla. Il permettra également de faciliter l'utilisation et la modification de celui-ci. En bref, ceci est une doc du code SWAN.</b> 
 <h1 id="table_des_matières">
