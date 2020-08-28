@@ -1,1 +1,0 @@
-[link to SWAN Documentation](http://gitlab.com/Gui114ume/taitoko/-/blob/master/SWANDocumentation.html)
