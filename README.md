@@ -133,7 +133,7 @@ $D$   : profondeur<br>
 
 
 Vous trouverez ci-dessous le schéma numérique implémenté, ainsi qu'une illustration d'une maille. Cette dernière montre comment sont organisées les données sur le maillage.<br>
-<img src="image_doc_gitlab/maille.png" alt="maille"></img><br>
+<img src="./README_images/maille.png" alt="maille"></img><br>
 
 \begin{align}
 H^{n+1}_{i,j} = H^n_{i,j} - \Delta t \Biggl[ \frac{U^n_{i+1,j}}{\Delta x}(TD1) - \frac{U^n_{i,j}}{\Delta x}(TD2) +  \frac{V^n_{i,j+1}}{\Delta y}(TV1) -  \frac{V^n_{i,j}}{\Delta y}(TV2)\Biggr] + R^{n+1}_{i,j} - R^{n}_{i,j}
@@ -181,30 +181,30 @@ S^B_{i,j} &amp = gU^n_{i,j}\frac{\Biggl[(U^n_{i,j})^2 + (V^n_{i,j})^2\Biggr]^{1/
 
 
 <h1 id="___LE_GRAPHE_DU_PROGRAMME"> Le graphe du programme </h1>
-<img src="image_doc_gitlab/grapheSwangeo.png" alt="graphe du programme swangeo"></img><br>
+<img src="./README_images/grapheSwangeo.png" alt="graphe du programme swangeo"></img><br>
 
 <h1 id="___LES_FONCTION_DE_LECTURE_DE_FICHIERS"> Les fonction de lecture de fichiers </h1>
 
 Comme dans beaucoup de programme, l'initialisation des variables nécessaires à la simulation requiert la lecture de données depuis des fichiers. Dans notre cas, nous sommes amenés à lire des fichiers avec extension .nc ou .grd, qui sont des fichiers au format netcdf. Il est possible d'inspecter manuellement le contenu d'un fichier en utilisant le programme "ncdump". Il est également possible d'utiliser une librairie afin d'extraire les données. C'est cette dernière possibilité qu'utilise notre code. De plus ample informations peuvent être trouvées sur le site de <a href="https://www.unidata.ucar.edu/software/netcdf/docs/index.html" target="_self">l'organisation</a> gérant la libnetcdf.<br> Ci-dessous une image montrant l'organisation des données au sein d'un fichier .grd.<br>
-<img src="image_doc_gitlab/ncdump.png" alt="ncdump_result"></img><br>
+<img src="./README_images/ncdump.png" alt="ncdump_result"></img><br>
 Les fonctions de lecture de fichiers .grd sont ce que nous appelons des fonctions externes. Celles-ci s'exécutent obligatoirement de manière séquentielle. Dans le cas du code SWAN, les seules fonctions externes utilisées sont des fonctions de lecture de fichier. Nous allons détaillez un peu. Les fichiers .grd sont utilisés pour initialiser les variables vivant sur les cells ( H, D, R, latitude, longitude). Lorsque l'utilisateur écrit quelque chose comme $\forall ic \in innerCells()$ dans un fichier source .nabla, cela sera traduit en une boucle sur toutes les innerCells. L'ordre de parcours des cells se fait ligne par ligne, du bas vers le haut. Les valeurs des grandeurs d'intérêt stockées dans les fichiers sont ordonnées de la même façon. Les fonctions de lecture ne font donc que récupérer les données dans un tableau, puis renvoient les valeurs une par une. À chaque appel, un compteur, qui est l'indice de la prochaine valeur à renvoyer, est incrémenté. Dans le cas des longitudes et latitudes, leur fonction externe respective, doit procéder à une étape supplémentaire entre la lecture et la création du tableau de données. Cette dernière information n'intéressera que les personnes voulant comprendre le code des fonctions externes ou voulant modifier ces dernières.<br>
 Un utilisateur doit seulement retenir que les variables stockées sur chaque cell, se remplissent ligne par ligne, du bas vers le haut.<br>
 Il doit également se souvenir que le maillage utilisé contient un "bord artificiel" servant à imposer des conditions au bord. Les fichiers .grd contiennent uniquement les valeurs des innerCells ! Nous verrons par la suite que la taille du maillage est donnée au programme par un fichier .json. Cette taille prend en compte le bord artificiel.<br>
 Ci-dessous une illustration expliquant comment la libnetcdf est utilisée dans le code des fonctions externes.<br>
-<img src="image_doc_gitlab/lecturegrd.png" alt="explication lecture de fichier .nc .grd"></img>
+<img src="./README_images/lecturegrd.png" alt="explication lecture de fichier .nc .grd"></img>
 
 <h1 id="___LES_SINGLETONS"> Les singletons </h1>
 Vous remarquez que le code comporte beaucoup de $\forall qqchose \in unensemble$. Ces expressions sont en principe transcrite comme des boucles sur chacun des éléments de "unensemble". Dans notre cas, il faut voir ça uniquement comme un point de syntaxe à connaitre. En effet, dans le code SWAN, les ensembles sont souvent des singletons. Nous pouvons donc voir ces expressions comme des "définitions", $\forall rc \in rightCell(c)$ peut être lu ici, et à priori seulement ici, dans le code SWAN, "soit rc la cellule à droite de c". Cette information va sans doute faciliter la lecture et la compréhension du code.<br>
 
 <h1 id="___L_INITIALISATION_DES_VARIABLES"> L'initialisation des variables </h1>
 Lors de la lecture du code, vous avez remarqué (ou vous remarquerez) que l'initialisation se fait à l'aide d'une "astuce". En effet, souvenons nous que nous avons autour du vrai maillage, un "bord artificiel". Celui-ci est constitué de cells (et de faces ) que l'on doit mettre à jour à chaque pas de temps. Jusqu'ici rien d'anormal. Si ce n'est que chaque cell et face du bord du maillage, va être initialisé en allant chercher les valeurs de son plus proche voisin contenu dans le vrai maillage. Il n'est pas possible d'imposer d'ordonnancement(initialiser d'abord l'intérieur, puis les bords) au temps t=0 avec le langage nabla. Nous devons donc utiliser deux variables, H et Hini afin d'initialiser, au temps $t_0$, la variable H. Nous remplissons d'abord l'intérieur du maillage à l'aide de Hini, puis nous clonons les valeurs sur le bord, avant de recopier dans H, les valeurs de Hini. Si nous ne faisons pas cela, NabLab va détecter un cycle, et refusera de générer du code.<br>
-<img src="image_doc_gitlab/maillage.png" alt="maillage"></img>
+<img src="./README_images/maillage.png" alt="maillage"></img>
 
 <h1 id="___UTILISATION_DU_PROGRAMME"> Utilisation du programme </h1>
 L'utilisation des programmes swan et swangeo est grandement simplifiée grâce aux capacités de NabLab. Après compilation des sources, le programme s'exécute comme suit : <br>
 ./swan path/to/options.json<br>
 L'intégralité des informations à fournir au programme doit être écrite dans ce fichier d'options. Nous allons détailler son contenu et expliquer brièvement le rôle de chacun des champs du fichier json.<br>
-<img src="image_doc_gitlab/json.png" alt="json"></img><br>
+<img src="./README_images/json.png" alt="json"></img><br>
 
 <h1 id="___LES_PROBLEMES_D_AFFICHAGE"> Les problèmes d'affichage </h1>
 Des problèmes d'affichage peuvent survenir. Généralement, cela signifie que les valeurs contenues dans les fichiers de résultats sont égales à Inf, nan, -nan, etc.
@@ -281,16 +281,16 @@ Vous trouverez ci-dessous les résultats de la propagation du tsunami de Boumerd
 Nous pouvons remarquer que la valeur calculé par "swangeo" au niveau de la ville de Leucate (ville représentée la plus à gauche) est incohérente avec les données du CEA. Nous n'avons pas d'explication pour cela. Conernant la ville de Fos-sur-mer, nous avons calculé un temps d'arrivé de 95 minutes, contre 120 fournis par le CEA. Bien que celà soit cohérent ( 95 < 120 ), la différence reste assez importante. Pour toutes les autres villes, les temps d'arrivées calculés sont cohérents avec ceux du CEA. De plus, la forme de la première vague correspond bien à celle fournit par le CEA.<br>
 
 TEMPS D'ARRIVEE DU TSUNAMI CALCULE AVEC SWANGEO <br>
-<img src="image_doc_gitlab/simulationBoumerdesAnnotationCalc.svg" alt="maille"></img><br>
+<img src="./README_images/simulationBoumerdesAnnotationCalc.svg" alt="maille"></img><br>
 TEMPS D'ARRIVEE DU TSUNAMI CALCULE PAR LE CEA <br>
-<img src="image_doc_gitlab/simulationBoumerdesAnnotationCEA.svg" alt="maille"></img><br>
+<img src="./README_images/simulationBoumerdesAnnotationCEA.svg" alt="maille"></img><br>
 <br>
 Nous allons maintenant nous intéresser aux mesures de performances qui ont été effectués. Nous n'avons traité que les codes générés avec les backends C++ Multithread STL et C++ Multithread Kokkos. Nous avons étudier les propriétés de scalabilités forte. Les mesures ont été faites sur le programme "swan" avec un cas test "canal" disponible sur le gitlab, dans les usecases. La version testée était encore en développement aux moments des mesures, mais les algorithmes effectuant la quasi totalité des calculs étaient déjà implémentés. Nous allons maintenant expliquer nos mesures : <br>
 <ul>
   <li>Scalabilité forte : Pour étudier la scalabilité forte, il faut doubler la puissance de calcul (ici on double le nombre de processeur) en concervant la taille du problème constante(ici la taille du maillage). Dans l'idéal, en doublant le nombre de processeur, le temps de calcul devrait être divisé par deux. Ce résultat est théorique, en pratique, le gain de temps est beaucoup moins élevé. Le but est seulement de s'approcher le plus possible d'un facteur deux. Nous avons étudié la scalabilité forte en faisant varier le pas d'écriture. Cela nous a permis de prouver que ce pas était un facteur limitant. Nous avons également étudié la scalabilité forte, en fonction de la taille du maillage pour le backend C++ Multithread STL.</li>
-  <img src="image_doc_gitlab/scala_forte_stl_mesh_var.png" alt="scala_forte_stl_mesh_var"></img><br>
-  <img src="image_doc_gitlab/scala_forte_stl_step.png" alt=" scala_forte_stl_step"></img><br>
-  <img src="image_doc_gitlab/scala_forte_kokkos_step.png" alt="scala_forte_kokkos_step"></img><br>
+  <img src="./README_images/scala_forte_stl_mesh_var.png" alt="scala_forte_stl_mesh_var"></img><br>
+  <img src="./README_images/scala_forte_stl_step.png" alt=" scala_forte_stl_step"></img><br>
+  <img src="./README_images/scala_forte_kokkos_step.png" alt="scala_forte_kokkos_step"></img><br>
 </ul>
 
 Sur les 3 graphes ci-dessus, lorsque la taille du maillage n'est pas précisée, celle-ci est de l'ordre de 50 000 mailles. Nous pensons que c'est ce qui explique le fait que les durées d'exécutions en fonctions du nombres processeurs utilisés sont relativement constant, pour un pas d'écriture donné. La création des threads est coûteuse et masque tout possible gain de performance.<br>
